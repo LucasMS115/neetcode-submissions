@@ -1,0 +1,39 @@
+class Solution {
+    /**
+     * @param {number} numCourses
+     * @param {number[][]} prerequisites
+     * @return {boolean}
+     */
+
+    canFinish(numCourses, prerequisites) {
+        const courseToPrs = {},
+              visited = new Set();
+
+        for (const [course, pr] of prerequisites) {
+            if (!courseToPrs[course]) courseToPrs[course] = new Set([pr]);
+            else courseToPrs[course].add(pr);
+        }
+
+        function canComplete (course) {
+            if (visited.has(course)) return false;
+            if (!courseToPrs[course] || !courseToPrs[course].size) return true;
+
+            visited.add(course);
+
+            for (const pr of courseToPrs[course]) {
+                if (canComplete(pr, visited)) courseToPrs[course].delete(pr);
+            }
+
+            visited.delete(course);
+
+            if (courseToPrs[course].size) return false;
+            return true;
+        }
+
+        for (const course of Object.keys(courseToPrs)) {
+            if (!canComplete(course)) return false;
+        }
+
+        return true;
+    }
+}

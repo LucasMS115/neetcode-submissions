@@ -1,0 +1,50 @@
+class Solution {
+    /**
+     * @param {number[][]} heights
+     * @return {number[][]}
+     */
+    pacificAtlantic(heights) {
+        const reachPacific = this.reachOcean(heights, 0, 0);
+        const reachAtlantic = this.reachOcean(heights, heights.length-1, heights[0].length-1);
+
+        const res = [];
+        for (const pair of reachPacific.intersection(reachAtlantic)) {
+            const tuple = pair.split(',').map(strNum => parseInt(strNum));
+            res.push(tuple);
+        }
+        
+        return res;
+    }
+
+    reachOcean(heights, oceanRow, oceanCol) {
+        const ROWS = heights.length,
+              COLS = heights[0].length;
+              
+        const res = new Set();
+
+        function dfs(row, col, prev) {
+            if (row < 0 || row >= ROWS || col < 0 || col >= COLS ||
+                res.has([row, col].toString()) || heights[row][col] < prev) {
+                return;
+            }
+
+            res.add([row, col].toString());
+
+            dfs(row-1, col, heights[row][col]);
+            dfs(row+1, col, heights[row][col]);
+            dfs(row, col-1, heights[row][col]);
+            dfs(row, col+1, heights[row][col]);           
+        }
+
+        for (let col = 0; col < COLS; col++) {
+            dfs(oceanRow, col, -Infinity);
+        }
+
+        for (let row = 0; row < ROWS; row++) {
+            dfs(row, oceanCol, -Infinity);
+        } 
+
+        return res;
+    }
+
+}
